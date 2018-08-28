@@ -14,8 +14,8 @@ The repo has the source code for the series of blog posts written as I built thi
 08. ReceiveTransmitInterrupt(https://blog.devmobile.co.nz/2018/08/08/rfm95-96-97-98-shield-library-part8/)
 09. RefactorRegisterManager(https://blog.devmobile.co.nz/2018/08/09/rfm95-96-97-98-shield-library-part9/)
 10. EnumAndMasks(https://blog.devmobile.co.nz/2018/08/23/rfm95-96-97-98-shield-library-part-10/)
-11. ReceiveTransmitEvents
-12. ReceiveFifo
+11. ReceiveTransmitEvents (https://blog.devmobile.co.nz/2018/08/24/poetry-in-klingon/)
+12. ReceiveFifo (https://wordpress.com/view/blog.devmobile.co.nz)
 13. Rfm9xLoRaDeviceClient
 
 Rfm9XLoRaDevice
