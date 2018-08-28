@@ -7,7 +7,7 @@
     <ProjectGuid>{70FDE518-1025-4D6D-AA20-13506EA13036}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Rfm9xLoRaDeviceClient</RootNamespace>
+    <RootNamespace>devMobile.IoT.Rfm9x.LoRaDeviceClient</RootNamespace>
     <AssemblyName>Rfm9xLoRaDeviceClient</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -132,6 +132,12 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.1.7</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rfm9XLoRaDevice\Rfm9XLoRaDevice.csproj">
+      <Project>{7c875578-673e-4896-8b01-8cd9f6df0c7d}</Project>
+      <Name>Rfm9XLoRaDevice</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">
     <VisualStudioVersion>15.0</VisualStudioVersion>
