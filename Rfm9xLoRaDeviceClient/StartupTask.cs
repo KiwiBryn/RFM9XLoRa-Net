@@ -26,31 +26,51 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 	public sealed class StartupTask : IBackgroundTask
     {
+		private byte NessageCount = Byte.MaxValue;
+#if DRAGINO
 		private const byte ChipSelectLine = 25;
 		private const byte ResetLine = 17;
 		private const byte InterruptLine = 4;
-		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine); // Dragino/M2m shields
-		//private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, ResetLine, InterruptLine); // Elecrow/Electronic tricks shields
-		private byte NessageCount = Byte.MaxValue;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine);
+#endif
+#if M2M
+		private const byte ChipSelectLine = 25;
+		private const byte ResetLine = 17;
+		private const byte InterruptLine = 4;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine);
+#endif
+#if ELECROW 
+		private const byte ResetLine = 22;
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, ResetLine, InterruptLine);
+#endif
+#if ELECTRONIC_TRICKS
+		private const byte ResetLine = 22;
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, 22, 25);
+#endif
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
 			rfm9XDevice.Initialise(Rfm9XDevice.RegOpModeMode.ReceiveContinuous, 915000000.0, paBoost: true);
 
+#if DEBUG
 			rfm9XDevice.RegisterDump();
-
+#endif
 			rfm9XDevice.OnReceive += Rfm9XDevice_OnReceive;
 			rfm9XDevice.OnTransmit += Rfm9XDevice_OnTransmit;
 
+			Task.Delay(10000).Wait();
+
 			while (true)
 			{
-				string messageText = "Hello W10 IoT Core LoRa! " + NessageCount.ToString();
+				string messageText = string.Format("Hello W10 IoT Core LoRa! {0}", NessageCount);
 				NessageCount -= 1;
-				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
-				Debug.WriteLine("{0}-Sending {1} bytes message {2}", DateTime.Now.ToShortTimeString(), messageBytes.Length, messageText);
-				this.rfm9XDevice.SendMessage(messageBytes);
 
-				Debug.Write(".");
+				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
+				Debug.WriteLine("{0:HH:mm:ss}-TX {1} byte message {2}", DateTime.Now, messageBytes.Length, messageText);
+				this.rfm9XDevice.Send(messageBytes);
+
 				Task.Delay(10000).Wait();
 			}
 		}
@@ -60,7 +80,8 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 			try
 			{
 				string messageText = UTF8Encoding.UTF8.GetString(e.Data);
-				Debug.WriteLine("{0}-Received {1} byte message {2}", DateTime.Now.ToShortTimeString(), e.Data.Length, messageText);
+
+				Debug.WriteLine("{0:HH:mm:ss}-RX {1} byte message {2}", DateTime.Now, e.Data.Length, messageText);
 			}
 			catch (Exception ex)
 			{
@@ -70,7 +91,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 		private void Rfm9XDevice_OnTransmit(object sender, Rfm9XDevice.OnDataTransmitedEventArgs e)
 		{
-			Debug.WriteLine("{0}-Transmit-Done", DateTime.Now.ToShortTimeString());
+			Debug.WriteLine("{0:HH:mm:ss}-TX Done", DateTime.Now);
 		}
 	}
 }

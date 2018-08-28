@@ -18,9 +18,7 @@ namespace devMobile.IoT.Rfm9x
 {
 	using System;
 	using System.Diagnostics;
-//	using System.Text;
-//	using System.Runtime.InteropServices.WindowsRuntime;
-	using System.Threading.Tasks;
+   using System.Threading.Tasks;
 	using Windows.Devices.Gpio;
 
 	public sealed class Rfm9XDevice
@@ -28,7 +26,6 @@ namespace devMobile.IoT.Rfm9x
 		public delegate void OnDataReceivedHandler(byte[] data);
 		public class OnDataReceivedEventArgs : EventArgs
 		{
-			//public int Threshold { get; set; }
 			public byte[] Data { get; set; }
 		}
 		public delegate void onReceivedEventHandler(Object sender, OnDataReceivedEventArgs e);
@@ -37,7 +34,6 @@ namespace devMobile.IoT.Rfm9x
 		public delegate void OnDataTransmittedHandler(byte[] data);
 		public class OnDataTransmitedEventArgs : EventArgs
 		{
-			//public int Threshold { get; set; }
 			public byte[] Data { get; set; }
 		}
 		public delegate void onTransmittededEventHandler(Object sender, OnDataTransmitedEventArgs e);
@@ -72,7 +68,7 @@ namespace devMobile.IoT.Rfm9x
 			// RegPktSnrVale=0x19
 			// RegPktRssiValue=0x1A
 			// RegRssiValue=0x1B
-			// RegHopChannel=0x1C
+			RegHopChannel = 0x1C,
 			RegModemConfig1 = 0x1D,
 			RegModemConfig2 = 0x1E,
 			RegSymbTimeout = 0x1F,
@@ -209,6 +205,20 @@ namespace devMobile.IoT.Rfm9x
 			ClearAll = 0b11111111,
 		}
 
+		[Flags]
+		enum RegHopChannelFlags : byte
+		{
+			PllTimeout = 0b10000000,
+			CrcOnPayload = 0b01000000,
+		}
+
+		enum RegHopChannelMask : byte
+		{
+			PllTimeout = 0b10000000,
+			CrcOnPayload = 0b01000000,
+			FhssPresentChannel = 0b01111111,
+		}
+
 		// RegModemConfig1
 		public enum RegModemConfigBandwidth : byte
 		{
@@ -313,19 +323,29 @@ namespace devMobile.IoT.Rfm9x
 		// RegSyncWord Syncword default for public networks
 		private const byte RegSyncWordDefault = 0x12;
 
+		// RegDioMapping1 
+		[Flags]
+		public enum RegDioMapping1
+		{
+			Dio0RxDone = 0b00000000,
+			Dio0TxDone = 0b01000000,
+			Dio0CadDone = 0b1000000,
+		}
+
 		// The Semtech ID Relating to the Silicon revision
 		private const byte RegVersionValueExpected = 0x12;
 
 		// Hardware configuration support
+		private readonly GpioPin InterruptGpioPin = null;
+		private readonly GpioPin ResetGpioPin = null;
+		private readonly RegisterManager RegisterManager = null;
+		private readonly Object Rfm9XRegFifoLock = new object();
 		private RegOpModeMode RegOpModeModeCurrent = RegOpModeMode.Sleep;
 		private double Frequency = FrequencyDefault;
-		private GpioPin InterruptGpioPin = null;
-		private GpioPin ResetGpioPin = null;
-		private RegisterManager RegisterManager = null;
-		private readonly Object Rfm9XRegFifoLock = new object();
+		private bool RxDoneIgnoreIfCrcMissing = true;
+		private bool RxDoneIgnoreIfCrcInvalid = true;
 
-
-		// Constructor for shields with chip select connected to CS0/CS1 e.g. Elecrow/Electronic tricks
+		// Constructor for RPI shields with chip select connected to CS0/CS1 e.g. Elecrow/Electronic tricks
 		public Rfm9XDevice(ChipSelectPin chipSelectPin, int resetPinNumber, int interruptPinNumber)
 		{
 			RegisterManager = new RegisterManager(chipSelectPin);
@@ -351,7 +371,7 @@ namespace devMobile.IoT.Rfm9x
 			InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
 		}
 
-		// Constructor for shields with chip select not connected to CS0/CS1 (but needs to be configured anyway) e.g. Dragino
+		// Constructor for RPI shields with chip select not connected to CS0/CS1 (but needs to be configured anyway) e.g. Dragino
 		public Rfm9XDevice(ChipSelectPin chipSelectPin, int chipSelectPinNumber, int resetPinNumber, int interruptPinNumber)
 		{
 			RegisterManager = new RegisterManager(chipSelectPin, chipSelectPinNumber);
@@ -395,6 +415,7 @@ namespace devMobile.IoT.Rfm9x
 
 		public void Initialise(RegOpModeMode modeAfterInitialise, // RegOpMode
 			double frequency = FrequencyDefault, // RegFrMsb, RegFrMid, RegFrLsb
+			bool rxDoneignoreIfCrcMissing = true, bool rxDoneignoreIfCrcInvalid = true,
 			bool paBoost = false, byte maxPower = RegPAConfigMaxPowerDefault, byte outputPower = RegPAConfigOutputPowerDefault, // RegPaConfig
 			bool ocpOn = true, byte ocpTrim = RegOcpOcpTrimDefault, // RegOcp
 			RegLnaLnaGain lnaGain = LnaGainDefault, bool lnaBoostLF = false, bool lnaBoostHf = false, // RegLna
@@ -413,6 +434,8 @@ namespace devMobile.IoT.Rfm9x
 			byte syncWord = RegSyncWordDefault)
 		{
 			Frequency = frequency; // Store this away for RSSI adjustments
+			RxDoneIgnoreIfCrcMissing = rxDoneignoreIfCrcMissing;
+			RxDoneIgnoreIfCrcInvalid = rxDoneignoreIfCrcInvalid;
 			RegOpModeModeCurrent = modeAfterInitialise;
 
 			// Strobe Reset pin briefly to factory reset SX127X chip
@@ -433,7 +456,7 @@ namespace devMobile.IoT.Rfm9x
 				RegisterManager.WriteByte((byte)Registers.RegFrLsb, bytes[0]);
 			}
 
-			// Set RegPaConfig if any of the associated settings are nto the default values
+			// Set RegPaConfig if any of the associated settings are not defaults
 			if ((paBoost != false) || (maxPower != RegPAConfigMaxPowerDefault) || (outputPower != RegPAConfigOutputPowerDefault))
 			{
 				byte regPaConfigValue = maxPower;
@@ -577,13 +600,73 @@ namespace devMobile.IoT.Rfm9x
 				RegisterManager.WriteByte((byte)Registers.RegSyncWord, syncWord);
 			}
 
-			// TODO revist this split & move to onReceive function
-			RegisterManager.WriteByte(0x40, 0b00000000); // RegDioMapping1 0b00000000 DI0 RxReady & TxReady
-
 			// Configure RegOpMode before returning
 			SetMode(modeAfterInitialise);
 		}
 
+
+
+		private void ProcessTxDone(byte IrqFlags)
+		{
+			Debug.Assert(IrqFlags != 0);
+			SetMode(RegOpModeModeCurrent);
+
+ 			OnDataTransmitedEventArgs transmitArgs = new OnDataTransmitedEventArgs();
+
+			OnTransmit?.Invoke(this, transmitArgs);
+		}
+
+		private void ProcessRxDone(byte IrqFlags)
+		{
+			byte[] messageBytes;
+			Debug.Assert(IrqFlags != 0);
+
+			// Check to see if payload has CRC 
+			if (RxDoneIgnoreIfCrcMissing)
+			{
+				byte regHopChannel = this.RegisterManager.ReadByte((byte)Registers.RegHopChannel);
+				if ((regHopChannel & (byte)RegHopChannelMask.CrcOnPayload) != (byte)RegHopChannelFlags.CrcOnPayload)
+				{
+					return;
+				}
+			}
+
+			// Check to see if payload CRC is valid
+			if (RxDoneIgnoreIfCrcInvalid)
+			{
+				if ((IrqFlags & (byte)RegIrqFlagsMask.PayLoadCrcErrorMask) == (byte)RegIrqFlagsMask.PayLoadCrcErrorMask)
+				{
+					return;
+				}
+			}
+
+			// Extract the message from the RFM9X fifo, try and keep lock in place for the minimum possible time
+			lock (Rfm9XRegFifoLock)
+			{
+				byte currentFifoAddress = this.RegisterManager.ReadByte((byte)Registers.RegFifoRxCurrent); 
+
+				this.RegisterManager.WriteByte((byte)Registers.RegFifoAddrPtr, currentFifoAddress); 
+
+				byte numberOfBytes = this.RegisterManager.ReadByte((byte)Registers.RegRxNbBytes);
+
+				// Allocate buffer for message
+				messageBytes = new byte[numberOfBytes];
+
+				for (int i = 0; i < numberOfBytes; i++)
+				{
+					messageBytes[i] = this.RegisterManager.ReadByte((byte)Registers.RegFifo);
+				}
+			}
+
+			// TODO : get RSSI etc.
+			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
+			{
+				Data = messageBytes
+			};
+
+			OnReceive?.Invoke(this, receiveArgs);
+		}
+	
 		private void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
 			if (args.Edge != GpioPinEdge.RisingEdge)
@@ -591,75 +674,33 @@ namespace devMobile.IoT.Rfm9x
 				return;
 			}
 
-			RegIrqFlagsMask IrqFlags = (RegIrqFlagsMask)this.RegisterManager.ReadByte((byte)Registers.RegIrqFlags);
-			Debug.WriteLine(string.Format("RegIrqFlags {0}", Convert.ToString((byte)IrqFlags, 2).PadLeft(8, '0')));
+			// Read RegIrqFlags to see what caused the interrupt
+			Byte IrqFlags = this.RegisterManager.ReadByte((byte)Registers.RegIrqFlags);
 
-			if ((IrqFlags & RegIrqFlagsMask.RxDoneMask) == RegIrqFlagsMask.RxDoneMask)  // RxDone 
+			// Check RxDone for inbound message
+			if ((IrqFlags & (byte)RegIrqFlagsMask.RxDoneMask) == (byte)RegIrqFlags.RxDone)
 			{
-				byte[] messageBytes;
-
-				// Try and keep lock in place for the minimum possible time
-				lock (Rfm9XRegFifoLock)
-				{
-					byte currentFifoAddress = this.RegisterManager.ReadByte((byte)Registers.RegFifoRxCurrent); // RegFifoRxCurrent
-					this.RegisterManager.WriteByte((byte)Registers.RegFifoAddrPtr, currentFifoAddress); // RegFifoAddrPtr
-
-					byte numberOfBytes = this.RegisterManager.ReadByte((byte)Registers.RegRxNbBytes);
-
-					// Allocate buffer for message
-					messageBytes = new byte[numberOfBytes];
-
-					for (int i = 0; i < numberOfBytes; i++)
-					{
-						messageBytes[i] = this.RegisterManager.ReadByte((byte)Registers.RegFifo);
-					}
-				}
-
-				if (this.OnReceive != null)
-				{
-					OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs();
-
-					receiveArgs.Data = messageBytes;
-
-					OnReceive(this, receiveArgs);
-				}
+				ProcessRxDone(IrqFlags);
 			}
 
-			if ((IrqFlags & RegIrqFlagsMask.TxDoneMask) == RegIrqFlagsMask.TxDoneMask)
+			// Check TxDone for outbound message
+			if ((IrqFlags & (byte)RegIrqFlagsMask.TxDoneMask) == (byte)RegIrqFlags.TxDone)
 			{
-				Debug.WriteLine("TX-Done");
-				SetMode(RegOpModeModeCurrent);
-
-				if (this.OnTransmit != null)
-				{
-					OnDataTransmitedEventArgs transmitArgs = new OnDataTransmitedEventArgs();
-
-					OnTransmit(this, transmitArgs);
-				}
+				ProcessTxDone(IrqFlags);
 			}
 
-			// TODO need to set this based on RX/TX mode handlers. Set based on OnTransmit, onReceive != null
-			this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, 0b00000000); // RegDioMapping1 0b00000000 DI0 RxReady & TxReady
+			this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, (byte)RegDioMapping1.Dio0RxDone);
 			this.RegisterManager.WriteByte((byte)Registers.RegIrqFlags, (byte)RegIrqFlags.ClearAll);
 		}
 
-		public void ReceiveMessages()
+		public void Send(byte[] messageBytes)
 		{
-			// Set the RxReady flag in Dio mapping
-		}
+			Debug.Assert(messageBytes != null);
+			Debug.Assert(messageBytes.Length > 0);
 
-		public void ReceiveMessagesFor(byte address)
-		{
-			// Set the RxReady flag in Dio mapping
-
-		}
-
-		public void SendMessage(byte[] messageBytes)
-		{
 			lock (Rfm9XRegFifoLock)
 			{
-
-				this.RegisterManager.WriteByte((byte)Registers.RegFifoTxBaseAddr, 0x0); // RegFifoTxBaseAddress 
+				this.RegisterManager.WriteByte((byte)Registers.RegFifoTxBaseAddr, 0x0);
 
 				// Set the Register Fifo address pointer
 				this.RegisterManager.WriteByte((byte)Registers.RegFifoAddrPtr, 0x0);
@@ -670,17 +711,11 @@ namespace devMobile.IoT.Rfm9x
 				}
 
 				// Set the length of the message in the fifo
-				this.RegisterManager.WriteByte((byte)Registers.RegPayloadLength, (byte)messageBytes.Length); // RegPayloadLength
-
-				// TODO need to set this based on RX/TX mode handlers. Set based on OnTransmit, onReceive != null
-				this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, 0b01000000); // RegDioMapping1 0b00000000 DI0 RxReady & TxReady
-
-				SetMode(RegOpModeMode.Transmit);
+				this.RegisterManager.WriteByte((byte)Registers.RegPayloadLength, (byte)messageBytes.Length);
 			}
-		}
 
-		public void SendMessage(byte address, byte[] messageBytes)
-		{
+			this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, (byte)RegDioMapping1.Dio0TxDone); 
+			SetMode(RegOpModeMode.Transmit);
 		}
 	}
 }
