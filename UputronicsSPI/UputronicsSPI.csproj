@@ -7,7 +7,7 @@
     <ProjectGuid>{87B925E0-2CC3-4A90-A8C6-6C9A21192D4E}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UputronicsSPI</RootNamespace>
+    <RootNamespace>devMobile.IoT.Rfm9x.UputronicsSPI</RootNamespace>
     <AssemblyName>UputronicsSPI</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
