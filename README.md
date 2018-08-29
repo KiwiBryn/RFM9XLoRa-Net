@@ -16,8 +16,8 @@ The repo has the source code for the series of blog posts written as I built thi
 10. EnumAndMasks(https://blog.devmobile.co.nz/2018/08/23/rfm95-96-97-98-shield-library-part-10/)
 11. ReceiveTransmitEvents (https://blog.devmobile.co.nz/2018/08/24/poetry-in-klingon/)
 12. ReceiveFifo (https://wordpress.com/view/blog.devmobile.co.nz)
-13. Rfm9xLoRaDeviceClient
 
+Rfm9xLoRaDeviceClient
 Rfm9XLoRaDevice
 
 There are also projects for each of the shields
