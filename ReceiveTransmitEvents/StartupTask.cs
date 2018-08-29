@@ -28,7 +28,6 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitEvents
 		public delegate void OnDataReceivedHandler(byte[] data);
 		public class OnDataReceivedEventArgs : EventArgs
 		{
-			//public int Threshold { get; set; }
 			public byte[] Data { get; set; }
 		}
 		public delegate void onReceivedEventHandler(Object sender, OnDataReceivedEventArgs e);
@@ -37,7 +36,6 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitEvents
 		public delegate void OnDataTransmittedHandler(byte[] data);
 		public class OnDataTransmitedEventArgs : EventArgs
 		{
-			//public int Threshold { get; set; }
 			public byte[] Data { get; set; }
 		}
 		public delegate void onTransmittededEventHandler(Object sender, OnDataTransmitedEventArgs e);
@@ -642,18 +640,6 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitEvents
 			this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, 0b00000000); // RegDioMapping1 0b00000000 DI0 RxReady & TxReady
 			this.RegisterManager.WriteByte((byte)Registers.RegIrqFlags, (byte)RegIrqFlags.ClearAll);
 		}
-
-		public void ReceiveMessages()
-		{
-			// Set the RxReady flag in Dio mapping
-		}
-
-		public void ReceiveMessagesFor(byte address)
-		{
-			// Set the RxReady flag in Dio mapping
-
-		}
-
 		public void SendMessage(byte[] messageBytes)
 		{
 			lock (Rfm9XRegFifoLock)
@@ -678,10 +664,6 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitEvents
 				SetMode(RegOpModeMode.Transmit);
 			}
 		}
-
-		public void SendMessage(byte address, byte[] messageBytes)
-		{
-		}
 	}
 
 
@@ -705,11 +687,11 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitEvents
 
 			while (true)
 			{
-				//string messageText = "Hello W10 IoT Core LoRa! " + NessageCount.ToString();
-				//NessageCount -= 1;
-				//byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
-				//Debug.WriteLine("Sending {0} bytes message {1}", messageBytes.Length, messageText);
-				//this.rfm9XDevice.SendMessage(messageBytes);
+				string messageText = "Hello W10 IoT Core LoRa! " + NessageCount.ToString();
+				NessageCount -= 1;
+				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
+				Debug.WriteLine("Sending {0} bytes message {1}", messageBytes.Length, messageText);
+				this.rfm9XDevice.SendMessage(messageBytes);
 
 				Debug.Write(".");
 				Task.Delay(10000).Wait();
