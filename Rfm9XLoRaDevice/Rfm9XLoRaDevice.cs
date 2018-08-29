@@ -131,6 +131,9 @@ namespace devMobile.IoT.Rfm9x
 		// Frequency configuration magic numbers from Semtech SX127X specs
 		private const double RH_RF95_FXOSC = 32000000.0;
 		private const double RH_RF95_FSTEP = RH_RF95_FXOSC / 524288.0;
+		private const double RFMidBandThreshold = 525000000.0; // Search for RF_MID_BAND_THRESH GitHub LoRaNet LoRaMac-node/src/boards/sx1276-board.h
+		private const int RssiAdjustmentHF = -157;
+		private const int RssiAdjustmentLF = -164;
 
 		// RegFrMsb, RegFrMid, RegFrLsb
 		private const double FrequencyDefault = 434000000.0;
@@ -665,16 +668,16 @@ namespace devMobile.IoT.Rfm9x
 			float packetSnr = this.RegisterManager.ReadByte((byte)Registers.RegPktSnrValue) * 0.25f;
 
 			int rssi = this.RegisterManager.ReadByte((byte)Registers.RegRssiValue);
-			if (Frequency < 868E6)
-				rssi = -164 - rssi; // LF output port
+			if (Frequency < RFMidBandThreshold)
+				rssi = RssiAdjustmentLF + rssi; // LF output port
 			else
-				rssi = -157 + rssi; // HF output port
+				rssi = RssiAdjustmentHF + rssi; // HF output port
 
 			int packetRssi = this.RegisterManager.ReadByte((byte)Registers.RegPktRssiValue);
-			if (Frequency < 868E6)
-				packetRssi = -164 - rssi; // LF output port
+			if (Frequency < RFMidBandThreshold)
+				packetRssi = RssiAdjustmentLF + packetRssi; // LF output port
 			else
-				packetRssi = -157 - rssi; // HF output port
+				packetRssi = RssiAdjustmentHF + packetRssi; // HF output port
 			
 			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
 			{
