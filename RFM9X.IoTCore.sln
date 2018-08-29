@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M2MSPI", "M2MSPI\M2MSPI.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DraginoSPI", "DraginoSPI\DraginoSPI.csproj", "{55379553-3EF6-471B-BA37-2D069641BA81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "13.Rfm9xLoRaDeviceClient", "Rfm9xLoRaDeviceClient\13.Rfm9xLoRaDeviceClient.csproj", "{70FDE518-1025-4D6D-AA20-13506EA13036}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rfm9xLoRaDeviceClient", "Rfm9xLoRaDeviceClient\Rfm9xLoRaDeviceClient.csproj", "{70FDE518-1025-4D6D-AA20-13506EA13036}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "12.ReceiveFifo", "ReceiveFifo\12.ReceiveFifo.csproj", "{595A1ED3-3329-494F-8BD2-ECE3E8D22D85}"
 EndProject

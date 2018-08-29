@@ -81,7 +81,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 			{
 				string messageText = UTF8Encoding.UTF8.GetString(e.Data);
 
-				Debug.WriteLine("{0:HH:mm:ss}-RX {1} byte message {2}", DateTime.Now, e.Data.Length, messageText);
+				Debug.WriteLine(@"{0:HH:mm:ss}-RX PacketSnr {1:0.0} Packet RSSI {2}dBm RSSI {3}dBm = {4} byte message ""{5}""", DateTime.Now, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText);
 			}
 			catch (Exception ex)
 			{

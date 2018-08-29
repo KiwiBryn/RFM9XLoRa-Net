@@ -26,6 +26,9 @@ namespace devMobile.IoT.Rfm9x
 		public delegate void OnDataReceivedHandler(byte[] data);
 		public class OnDataReceivedEventArgs : EventArgs
 		{
+			public float PacketSnr { get; set; }
+			public int PacketRssi { get; set; }
+			public int Rssi { get; set; }
 			public byte[] Data { get; set; }
 		}
 		public delegate void onReceivedEventHandler(Object sender, OnDataReceivedEventArgs e);
@@ -65,9 +68,9 @@ namespace devMobile.IoT.Rfm9x
 			// RegRxPacketCntValueMsb=0x16
 			// RegRxPacketCntValueMsb=0x17
 			// RegModemStat=0x18
-			// RegPktSnrVale=0x19
-			// RegPktRssiValue=0x1A
-			// RegRssiValue=0x1B
+			RegPktSnrValue=0x19,
+			RegPktRssiValue=0x1A,
+			RegRssiValue=0x1B,
 			RegHopChannel = 0x1C,
 			RegModemConfig1 = 0x1D,
 			RegModemConfig2 = 0x1E,
@@ -658,9 +661,26 @@ namespace devMobile.IoT.Rfm9x
 				}
 			}
 
-			// TODO : get RSSI etc.
+			// Get the RSSI HF vs. LF port adjustment section 5.5.5 RSSI and SNR in LoRa Mode
+			float packetSnr = this.RegisterManager.ReadByte((byte)Registers.RegPktSnrValue) * 0.25f;
+
+			int rssi = this.RegisterManager.ReadByte((byte)Registers.RegRssiValue);
+			if (Frequency < 868E6)
+				rssi = -164 - rssi; // LF output port
+			else
+				rssi = -157 + rssi; // HF output port
+
+			int packetRssi = this.RegisterManager.ReadByte((byte)Registers.RegPktRssiValue);
+			if (Frequency < 868E6)
+				packetRssi = -164 - rssi; // LF output port
+			else
+				packetRssi = -157 - rssi; // HF output port
+			
 			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
 			{
+				PacketSnr = packetSnr,
+				Rssi = rssi,
+				PacketRssi = packetRssi,
 				Data = messageBytes
 			};
 
@@ -714,7 +734,7 @@ namespace devMobile.IoT.Rfm9x
 				this.RegisterManager.WriteByte((byte)Registers.RegPayloadLength, (byte)messageBytes.Length);
 			}
 
-			this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, (byte)RegDioMapping1.Dio0TxDone); 
+			this.RegisterManager.WriteByte((byte)Registers.RegDioMapping1, (byte)RegDioMapping1.Dio0TxDone);
 			SetMode(RegOpModeMode.Transmit);
 		}
 	}
