@@ -668,17 +668,17 @@ namespace devMobile.IoT.Rfm9x
 			float packetSnr = this.RegisterManager.ReadByte((byte)Registers.RegPktSnrValue) * 0.25f;
 
 			int rssi = this.RegisterManager.ReadByte((byte)Registers.RegRssiValue);
-			if (Frequency < RFMidBandThreshold)
-				rssi = RssiAdjustmentLF + rssi; // LF output port
+			if (Frequency > RFMidBandThreshold)
+				rssi = RssiAdjustmentHF + rssi;
 			else
-				rssi = RssiAdjustmentHF + rssi; // HF output port
+				rssi = RssiAdjustmentLF + rssi; 
 
 			int packetRssi = this.RegisterManager.ReadByte((byte)Registers.RegPktRssiValue);
-			if (Frequency < RFMidBandThreshold)
-				packetRssi = RssiAdjustmentLF + packetRssi; // LF output port
+			if (Frequency > RFMidBandThreshold)
+				packetRssi = RssiAdjustmentHF + packetRssi; 
 			else
-				packetRssi = RssiAdjustmentHF + packetRssi; // HF output port
-			
+				packetRssi = RssiAdjustmentLF + packetRssi; 
+
 			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
 			{
 				PacketSnr = packetSnr,
