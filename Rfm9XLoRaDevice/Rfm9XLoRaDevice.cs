@@ -47,6 +47,7 @@ namespace devMobile.IoT.Rfm9x
 		enum Registers : byte
 		{
 			MinValue = RegOpMode,
+
 			RegFifo = 0x0,
 			RegOpMode = 0x01,
 			//Reserved 0x02-0x06 
@@ -414,7 +415,14 @@ namespace devMobile.IoT.Rfm9x
 
 			regOpModeValue = RegOpModeLongRangeModeLoRa;
 			regOpModeValue |= RegOpModeAcessSharedRegLoRa;
-			regOpModeValue |= RegOpModeLowFrequencyModeOnHighFrequency;
+			if (Frequency > RFMidBandThreshold)
+			{
+				regOpModeValue |= RegOpModeLowFrequencyModeOnHighFrequency;
+			}
+			else
+			{
+				regOpModeValue |= RegOpModeLowFrequencyModeOnLowFrequency;
+			}
 			regOpModeValue |= (byte)mode;
 			RegisterManager.WriteByte((byte)Registers.RegOpMode, regOpModeValue);
 		}
@@ -424,7 +432,7 @@ namespace devMobile.IoT.Rfm9x
 			bool rxDoneignoreIfCrcMissing = true, bool rxDoneignoreIfCrcInvalid = true,
 			bool paBoost = false, byte maxPower = RegPAConfigMaxPowerDefault, byte outputPower = RegPAConfigOutputPowerDefault, // RegPaConfig
 			bool ocpOn = true, byte ocpTrim = RegOcpOcpTrimDefault, // RegOcp
-			RegLnaLnaGain lnaGain = LnaGainDefault, bool lnaBoostLF = false, bool lnaBoostHf = false, // RegLna
+			RegLnaLnaGain lnaGain = LnaGainDefault, bool lnaBoost = false, // RegLna
 			RegModemConfigBandwidth bandwidth = RegModemConfigBandwidthDefault, RegModemConfigCodingRate codingRate = RegModemConfigCodingRateDefault, RegModemConfigImplicitHeaderModeOn implicitHeaderModeOn = RegModemConfigImplicitHeaderModeOnDefault, //RegModemConfig1
 			RegModemConfig2SpreadingFactor spreadingFactor = RegModemConfig2SpreadingFactorDefault, bool txContinuousMode = false, bool rxPayloadCrcOn = false,
 			ushort symbolTimeout = SymbolTimeoutDefault,
@@ -486,16 +494,19 @@ namespace devMobile.IoT.Rfm9x
 			}
 
 			// Set RegLna if any of the settings not defaults
-			if ((lnaGain != LnaGainDefault) || (lnaBoostLF != false) || (lnaBoostHf != false))
+			if ((lnaGain != LnaGainDefault) || (lnaBoost != false))
 			{
 				byte regLnaValue = (byte)lnaGain;
-				if (lnaBoostLF)
+				if (lnaBoost)
 				{
-					regLnaValue |= RegLnaLnaBoostLfOn;
-				}
-				if (lnaBoostHf)
-				{
-					regLnaValue |= RegLnaLnaBoostHfOn;
+					if (Frequency > RFMidBandThreshold)
+					{
+						regLnaValue |= RegLnaLnaBoostHfOn;
+					}
+					else
+					{
+						regLnaValue |= RegLnaLnaBoostLfOn;
+					}
 				}
 				RegisterManager.WriteByte((byte)Registers.RegLna, regLnaValue);
 			}
@@ -669,15 +680,23 @@ namespace devMobile.IoT.Rfm9x
 
 			int rssi = this.RegisterManager.ReadByte((byte)Registers.RegRssiValue);
 			if (Frequency > RFMidBandThreshold)
+			{
 				rssi = RssiAdjustmentHF + rssi;
+			}
 			else
-				rssi = RssiAdjustmentLF + rssi; 
+			{
+				rssi = RssiAdjustmentLF + rssi;
+			}
 
 			int packetRssi = this.RegisterManager.ReadByte((byte)Registers.RegPktRssiValue);
 			if (Frequency > RFMidBandThreshold)
-				packetRssi = RssiAdjustmentHF + packetRssi; 
+			{
+				packetRssi = RssiAdjustmentHF + packetRssi;
+			}
 			else
-				packetRssi = RssiAdjustmentLF + packetRssi; 
+			{
+				packetRssi = RssiAdjustmentLF + packetRssi;
+			}
 
 			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
 			{
