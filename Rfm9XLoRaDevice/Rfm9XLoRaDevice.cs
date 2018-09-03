@@ -24,7 +24,7 @@ namespace devMobile.IoT.Rfm9x
 	public sealed class Rfm9XDevice
 	{
 		public delegate void OnDataReceivedHandler(byte[] data);
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 		public const byte AddressHeaderLength = 1;
 		public const byte AddressLengthMinimum = 1;
 		public const byte AddressLengthMaximum = 15;
@@ -32,7 +32,7 @@ namespace devMobile.IoT.Rfm9x
 
 		public class OnDataReceivedEventArgs : EventArgs
 		{
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 			public byte[] Address { get; set; }
 #endif
 			public float PacketSnr { get; set; }
@@ -360,7 +360,7 @@ namespace devMobile.IoT.Rfm9x
 		private double Frequency = FrequencyDefault;
 		private bool RxDoneIgnoreIfCrcMissing = true;
 		private bool RxDoneIgnoreIfCrcInvalid = true;
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 		private byte[] DeviceAddress = null;
 #endif
 
@@ -686,7 +686,7 @@ namespace devMobile.IoT.Rfm9x
 				}
 			}
 
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 			//check that message is long enough to contain header 
 			if (payloadBytes.Length < (AddressHeaderLength + AddressLengthMinimum + AddressLengthMinimum))
 			{
@@ -736,7 +736,7 @@ namespace devMobile.IoT.Rfm9x
 				packetRssi = RssiAdjustmentLF + packetRssi;
 			}
 
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 			byte[] address = new byte[fromAddressLength];
 			Array.Copy(payloadBytes, AddressHeaderLength + toAddressLength, address, 0, fromAddressLength);
 			byte[] messageBytes = new byte[messageLength];
@@ -745,13 +745,13 @@ namespace devMobile.IoT.Rfm9x
 
 			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
 			{
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 				Address = address,
 #endif
 				PacketSnr = packetSnr,
 				Rssi = rssi,
 				PacketRssi = packetRssi,
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 				Data = messageBytes,
 #else
 				Data = payloadBytes,
@@ -787,7 +787,7 @@ namespace devMobile.IoT.Rfm9x
 			this.RegisterManager.WriteByte((byte)Registers.RegIrqFlags, (byte)RegIrqFlags.ClearAll);
 		}
 
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 		public void Send(byte[] addressBytes, byte[] messageBytes)
 		{
 			Debug.Assert(addressBytes != null);
@@ -831,7 +831,7 @@ namespace devMobile.IoT.Rfm9x
 		}
 #endif
 
-#if ADDRESSED_MESSAGES
+#if ADDRESSED_MESSAGES_PAYLOAD
 		private void Send(byte[] messageBytes)
 #else
 		public void Send(byte[] messageBytes)
