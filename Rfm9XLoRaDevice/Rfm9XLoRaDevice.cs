@@ -24,8 +24,17 @@ namespace devMobile.IoT.Rfm9x
 	public sealed class Rfm9XDevice
 	{
 		public delegate void OnDataReceivedHandler(byte[] data);
+#if ADDRESSED_MESSAGES
+		public const byte AddressHeaderLength = 1;
+		public const byte AddressLengthMinimum = 1;
+		public const byte AddressLengthMaximum = 15;
+#endif
+
 		public class OnDataReceivedEventArgs : EventArgs
 		{
+#if ADDRESSED_MESSAGES
+			public byte[] Address { get; set; }
+#endif
 			public float PacketSnr { get; set; }
 			public int PacketRssi { get; set; }
 			public int Rssi { get; set; }
@@ -347,10 +356,13 @@ namespace devMobile.IoT.Rfm9x
 		private readonly GpioPin ResetGpioPin = null;
 		private readonly RegisterManager RegisterManager = null;
 		private readonly Object Rfm9XRegFifoLock = new object();
-		private RegOpModeMode RegOpModeModeCurrent = RegOpModeMode.Sleep;
+		private RegOpModeMode RegOpModeModeDefault = RegOpModeMode.Sleep;
 		private double Frequency = FrequencyDefault;
 		private bool RxDoneIgnoreIfCrcMissing = true;
 		private bool RxDoneIgnoreIfCrcInvalid = true;
+#if ADDRESSED_MESSAGES
+		private byte[] DeviceAddress = null;
+#endif
 
 		// Constructor for RPI shields with chip select connected to CS0/CS1 e.g. Elecrow/Electronic tricks
 		public Rfm9XDevice(ChipSelectPin chipSelectPin, int resetPinNumber, int interruptPinNumber)
@@ -427,7 +439,7 @@ namespace devMobile.IoT.Rfm9x
 			RegisterManager.WriteByte((byte)Registers.RegOpMode, regOpModeValue);
 		}
 
-		public void Initialise(RegOpModeMode modeAfterInitialise, // RegOpMode
+		public void Initialise( 
 			double frequency = FrequencyDefault, // RegFrMsb, RegFrMid, RegFrLsb
 			bool rxDoneignoreIfCrcMissing = true, bool rxDoneignoreIfCrcInvalid = true,
 			bool paBoost = false, byte maxPower = RegPAConfigMaxPowerDefault, byte outputPower = RegPAConfigOutputPowerDefault, // RegPaConfig
@@ -450,7 +462,6 @@ namespace devMobile.IoT.Rfm9x
 			Frequency = frequency; // Store this away for RSSI adjustments
 			RxDoneIgnoreIfCrcMissing = rxDoneignoreIfCrcMissing;
 			RxDoneIgnoreIfCrcInvalid = rxDoneignoreIfCrcInvalid;
-			RegOpModeModeCurrent = modeAfterInitialise;
 
 			// Strobe Reset pin briefly to factory reset SX127X chip
 			ResetGpioPin.Write(GpioPinValue.Low);
@@ -618,7 +629,7 @@ namespace devMobile.IoT.Rfm9x
 			}
 
 			// Configure RegOpMode before returning
-			SetMode(modeAfterInitialise);
+			SetMode( RegOpModeMode.Sleep);
 		}
 
 
@@ -626,16 +637,16 @@ namespace devMobile.IoT.Rfm9x
 		private void ProcessTxDone(byte IrqFlags)
 		{
 			Debug.Assert(IrqFlags != 0);
-			SetMode(RegOpModeModeCurrent);
+			SetMode(RegOpModeModeDefault);
 
- 			OnDataTransmitedEventArgs transmitArgs = new OnDataTransmitedEventArgs();
+			OnDataTransmitedEventArgs transmitArgs = new OnDataTransmitedEventArgs();
 
 			OnTransmit?.Invoke(this, transmitArgs);
 		}
 
 		private void ProcessRxDone(byte IrqFlags)
 		{
-			byte[] messageBytes;
+			byte[] payloadBytes;
 			Debug.Assert(IrqFlags != 0);
 
 			// Check to see if payload has CRC 
@@ -660,20 +671,47 @@ namespace devMobile.IoT.Rfm9x
 			// Extract the message from the RFM9X fifo, try and keep lock in place for the minimum possible time
 			lock (Rfm9XRegFifoLock)
 			{
-				byte currentFifoAddress = this.RegisterManager.ReadByte((byte)Registers.RegFifoRxCurrent); 
+				byte currentFifoAddress = this.RegisterManager.ReadByte((byte)Registers.RegFifoRxCurrent);
 
-				this.RegisterManager.WriteByte((byte)Registers.RegFifoAddrPtr, currentFifoAddress); 
+				this.RegisterManager.WriteByte((byte)Registers.RegFifoAddrPtr, currentFifoAddress);
 
 				byte numberOfBytes = this.RegisterManager.ReadByte((byte)Registers.RegRxNbBytes);
 
 				// Allocate buffer for message
-				messageBytes = new byte[numberOfBytes];
+				payloadBytes = new byte[numberOfBytes];
 
 				for (int i = 0; i < numberOfBytes; i++)
 				{
-					messageBytes[i] = this.RegisterManager.ReadByte((byte)Registers.RegFifo);
+					payloadBytes[i] = this.RegisterManager.ReadByte((byte)Registers.RegFifo);
 				}
 			}
+
+#if ADDRESSED_MESSAGES
+			//check that message is long enough to contain header 
+			if (payloadBytes.Length < (AddressHeaderLength + AddressLengthMinimum + AddressLengthMinimum))
+			{
+				return;
+			}
+
+			int toAddressLength = (payloadBytes[0] >> 4) & 0xf;
+			int fromAddressLength = payloadBytes[0] & 0xf;
+			int messageLength = payloadBytes.Length - (AddressHeaderLength + toAddressLength + fromAddressLength);
+
+			// Make sure the to and local addresses are the same length
+			if (toAddressLength != DeviceAddress.Length)
+			{
+				return;
+			}
+
+			// Compare the bytes of the addresses
+			for (int index = 0; index < DeviceAddress.Length; index++)
+			{
+				if (DeviceAddress[index] != payloadBytes[index + AddressHeaderLength])
+				{
+					return;
+				}
+			}
+#endif
 
 			// Get the RSSI HF vs. LF port adjustment section 5.5.5 RSSI and SNR in LoRa Mode
 			float packetSnr = this.RegisterManager.ReadByte((byte)Registers.RegPktSnrValue) * 0.25f;
@@ -698,17 +736,31 @@ namespace devMobile.IoT.Rfm9x
 				packetRssi = RssiAdjustmentLF + packetRssi;
 			}
 
+#if ADDRESSED_MESSAGES
+			byte[] address = new byte[fromAddressLength];
+			Array.Copy(payloadBytes, AddressHeaderLength + toAddressLength, address, 0, fromAddressLength);
+			byte[] messageBytes = new byte[messageLength];
+			Array.Copy(payloadBytes, AddressHeaderLength + toAddressLength + fromAddressLength, messageBytes, 0, messageLength);
+#endif
+
 			OnDataReceivedEventArgs receiveArgs = new OnDataReceivedEventArgs
 			{
+#if ADDRESSED_MESSAGES
+				Address = address,
+#endif
 				PacketSnr = packetSnr,
 				Rssi = rssi,
 				PacketRssi = packetRssi,
-				Data = messageBytes
+#if ADDRESSED_MESSAGES
+				Data = messageBytes,
+#else
+				Data = payloadBytes,
+#endif
 			};
 
 			OnReceive?.Invoke(this, receiveArgs);
 		}
-	
+
 		private void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
 			if (args.Edge != GpioPinEdge.RisingEdge)
@@ -735,7 +787,55 @@ namespace devMobile.IoT.Rfm9x
 			this.RegisterManager.WriteByte((byte)Registers.RegIrqFlags, (byte)RegIrqFlags.ClearAll);
 		}
 
+#if ADDRESSED_MESSAGES
+		public void Send(byte[] addressBytes, byte[] messageBytes)
+		{
+			Debug.Assert(addressBytes != null);
+			Debug.Assert(addressBytes.Length > AddressLengthMinimum);
+			Debug.Assert(addressBytes.Length < AddressLengthMaximum);
+			Debug.Assert(messageBytes != null);
+			Debug.Assert(messageBytes.Length > 0);
+
+			// construct payload from lengths and addresses
+			byte[] payLoadBytes = new byte[AddressHeaderLength + addressBytes.Length + DeviceAddress.Length + messageBytes.Length];
+
+			byte toAddressLength = (byte)(addressBytes.Length << 4);
+			byte fromAddressLength = (byte)DeviceAddress.Length;
+			payLoadBytes[0] = (byte)(toAddressLength | fromAddressLength);
+
+			// copy across the to & from addresses
+			Array.Copy(addressBytes, 0, payLoadBytes, 1, addressBytes.Length);
+			Array.Copy(DeviceAddress, 0, payLoadBytes, 1 + addressBytes.Length, DeviceAddress.Length);
+
+			// copy across the payload
+			Array.Copy(messageBytes, 0, payLoadBytes, 1 + addressBytes.Length + DeviceAddress.Length, messageBytes.Length);
+
+			Send(payLoadBytes);
+		}
+
+		public void Receive( byte[] address )
+		{
+			Debug.Assert(address != null);
+			Debug.Assert(address.Length >= AddressLengthMinimum);
+			Debug.Assert(address.Length <= AddressLengthMaximum);
+			DeviceAddress = address;
+
+			RegOpModeModeDefault = RegOpModeMode.ReceiveContinuous ;
+			SetMode(RegOpModeMode.ReceiveContinuous);
+		}
+#else
+		public void Receive()
+		{
+			RegOpModeModeDefault = RegOpModeMode.ReceiveContinuous ;
+			SetMode(RegOpModeMode.ReceiveContinuous);
+		}
+#endif
+
+#if ADDRESSED_MESSAGES
+		private void Send(byte[] messageBytes)
+#else
 		public void Send(byte[] messageBytes)
+#endif
 		{
 			Debug.Assert(messageBytes != null);
 			Debug.Assert(messageBytes.Length > 0);

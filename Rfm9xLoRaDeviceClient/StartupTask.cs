@@ -52,25 +52,34 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
-			rfm9XDevice.Initialise(Rfm9XDevice.RegOpModeMode.ReceiveContinuous, 915000000.0, paBoost: true);
+			rfm9XDevice.Initialise(915000000.0, paBoost: true, rxPayloadCrcOn : true);
 
 #if DEBUG
 			rfm9XDevice.RegisterDump();
 #endif
+
 			rfm9XDevice.OnReceive += Rfm9XDevice_OnReceive;
+#if ADDRESSED_MESSAGES
+			rfm9XDevice.Receive(UTF8Encoding.UTF8.GetBytes(Environment.MachineName));
+#else
+			rfm9XDevice.Receive();
+#endif
 			rfm9XDevice.OnTransmit += Rfm9XDevice_OnTransmit;
 
 			Task.Delay(10000).Wait();
 
 			while (true)
 			{
-				string messageText = string.Format("Hello W10 IoT Core LoRa! {0}", NessageCount);
+				string messageText = string.Format("Hello from {0} ! {1}", Environment.MachineName, NessageCount);
 				NessageCount -= 1;
 
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
 				Debug.WriteLine("{0:HH:mm:ss}-TX {1} byte message {2}", DateTime.Now, messageBytes.Length, messageText);
+#if ADDRESSED_MESSAGES
+				this.rfm9XDevice.Send(UTF8Encoding.UTF8.GetBytes("AddressGoesHere"), messageBytes);
+#else
 				this.rfm9XDevice.Send(messageBytes);
-
+#endif
 				Task.Delay(10000).Wait();
 			}
 		}
@@ -81,7 +90,13 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 			{
 				string messageText = UTF8Encoding.UTF8.GetString(e.Data);
 
+#if ADDRESSED_MESSAGES
+				string addressText = UTF8Encoding.UTF8.GetString(e.Address);
+
+				Debug.WriteLine(@"{0:HH:mm:ss}-RX From {1} PacketSnr {2:0.0} Packet RSSI {3}dBm RSSI {4}dBm = {5} byte message ""{6}""", DateTime.Now, addressText, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText);
+#else
 				Debug.WriteLine(@"{0:HH:mm:ss}-RX PacketSnr {1:0.0} Packet RSSI {2}dBm RSSI {3}dBm = {4} byte message ""{5}""", DateTime.Now, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText);
+#endif
 			}
 			catch (Exception ex)
 			{
