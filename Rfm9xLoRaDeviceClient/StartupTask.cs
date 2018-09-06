@@ -76,7 +76,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
 				Debug.WriteLine("{0:HH:mm:ss}-TX {1} byte message {2}", DateTime.Now, messageBytes.Length, messageText);
 #if ADDRESSED_MESSAGES_PAYLOAD
-				this.rfm9XDevice.Send(UTF8Encoding.UTF8.GetBytes("AddressGoesHere"), messageBytes);
+				this.rfm9XDevice.Send(UTF8Encoding.UTF8.GetBytes("AddressHere"), messageBytes);
 #else
 				this.rfm9XDevice.Send(messageBytes);
 #endif

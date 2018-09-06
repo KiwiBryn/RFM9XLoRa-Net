@@ -146,31 +146,32 @@ namespace devMobile.IoT.Rfm9x
 		private const int RssiAdjustmentLF = -164;
 
 		// RegFrMsb, RegFrMid, RegFrLsb
-		private const double FrequencyDefault = 434000000.0;
+		public const double FrequencyDefault = 434000000.0;
 
 		// RegPAConfig
 		private const Byte RegPAConfigPASelectRFO = 0b00000000;
 		private const Byte RegPAConfigPASelectPABoost = 0b10000000;
 		private const Byte RegPAConfigPASelectDefault = RegPAConfigPASelectRFO;
+		public const bool PABoostDefault = false;
 
 		private const byte RegPAConfigMaxPowerMin = 0b00000000;
 		private const byte RegPAConfigMaxPowerMax = 0b01110000;
-		private const byte RegPAConfigMaxPowerDefault = 0b01000000;
+		public const byte RegPAConfigMaxPowerDefault = 0b01000000;
 
 		private const byte RegPAConfigOutputPowerMin = 0b00000000;
 		private const byte RegPAConfigOutputPowerMax = 0b00001111;
-		private const byte RegPAConfigOutputPowerDefault = 0b00001111;
+		public const byte RegPAConfigOutputPowerDefault = 0b00001111;
 
 		// RegPaRamp appears to be for FSK only ?
 
 		// RegOcp
 		private const byte RegOcpOn = 0b00100000;
 		private const byte RegOcpOff = 0b00000000;
-		private const byte RegOcpDefault = RegOcpOn;
+		public const bool RegOcpDefault = true;
 
 		private const byte RegOcpOcpTrimMin = 0b00000000;
 		private const byte RegOcpOcpTrimMax = 0b00011111;
-		private const byte RegOcpOcpTrimDefault = 0b00001011;
+		public const byte RegOcpOcpTrimDefault = 0b00001011;
 
 		// RegLna
 		[Flags]
@@ -184,7 +185,8 @@ namespace devMobile.IoT.Rfm9x
 			G6 = 0b00000110
 		}
 		// Note the gain is backwards less = more
-		private const RegLnaLnaGain LnaGainDefault = RegLnaLnaGain.G1;
+		public const RegLnaLnaGain LnaGainDefault = RegLnaLnaGain.G1;
+		public const bool LnaBoostDefault = false;
 
 		private const byte RegLnaLnaBoostLfOn = 0b00011000;
 		private const byte RegLnaLnaBoostLfOff = 0b00000000;
@@ -249,7 +251,7 @@ namespace devMobile.IoT.Rfm9x
 			_250KHz = 0b10000000,
 			_500KHz = 0b10010000
 		}
-		private const RegModemConfigBandwidth RegModemConfigBandwidthDefault = RegModemConfigBandwidth._125KHz;
+		public const RegModemConfigBandwidth RegModemConfigBandwidthDefault = RegModemConfigBandwidth._125KHz;
 
 		public enum RegModemConfigCodingRate
 		{
@@ -258,14 +260,14 @@ namespace devMobile.IoT.Rfm9x
 			_4of7 = 0b00000110,
 			_4of8 = 0b00001000,
 		}
-		private const RegModemConfigCodingRate RegModemConfigCodingRateDefault = RegModemConfigCodingRate._4of5;
+		public const RegModemConfigCodingRate RegModemConfigCodingRateDefault = RegModemConfigCodingRate._4of5;
 
 		public enum RegModemConfigImplicitHeaderModeOn
 		{
 			ExplicitHeaderMode = 0b00000000,
 			ImplicitHeaderMode = 0b00000001,
 		}
-		private const RegModemConfigImplicitHeaderModeOn RegModemConfigImplicitHeaderModeOnDefault = RegModemConfigImplicitHeaderModeOn.ExplicitHeaderMode;
+		public const RegModemConfigImplicitHeaderModeOn RegModemConfigImplicitHeaderModeOnDefault = RegModemConfigImplicitHeaderModeOn.ExplicitHeaderMode;
 
 		// RegModemConfig2
 		public enum RegModemConfig2SpreadingFactor : byte
@@ -278,42 +280,46 @@ namespace devMobile.IoT.Rfm9x
 			_2048ChipsPerSymbol = 0b10110000,
 			_4096ChipsPerSymbol = 0b11000000,
 		}
-		private const RegModemConfig2SpreadingFactor RegModemConfig2SpreadingFactorDefault = RegModemConfig2SpreadingFactor._128ChipsPerSymbol;
+		public const RegModemConfig2SpreadingFactor RegModemConfig2SpreadingFactorDefault = RegModemConfig2SpreadingFactor._128ChipsPerSymbol;
 
 		private const byte RegModemConfig2TxContinuousModeOn = 0b00001000;
 		private const byte RegModemConfig2TxContinuousModeOff = 0b00000000;
-		private const byte RegModemConfig2TxContinuousModeDefault = RegModemConfig2TxContinuousModeOff;
+		public const byte RegModemConfig2TxContinuousModeDefault = RegModemConfig2TxContinuousModeOff;
 
 		private const byte RegModemConfig2RxPayloadCrcOn = 0b00000100;
 		private const byte RegModemConfig2RxPayloadCrcOff = 0b00000000;
-		private const byte RegModemConfig2RxPayloadCrcDefault = RegModemConfig2RxPayloadCrcOff;
+		public const byte RegModemConfig2RxPayloadCrcDefault = RegModemConfig2RxPayloadCrcOff;
 
 		// RegModemConfig2 for MSb RegSymbTimeoutLsb for LSB
-		private const byte SymbolTimeoutDefault = 0x64;
+		public const byte SymbolTimeoutDefault = 0x64;
 
 		// RegReambleMsb & RegReambleLsb
-		private const ushort PreambleLengthDefault = 0x08;
+		public const ushort PreambleLengthDefault = 0x08;
 
 		// RegPayloadLength
-		private const byte PayloadLengthDefault = 0x01;
+		public const byte PayloadLengthDefault = 0x01;
 
 		// RegMaxPayloadLength
-		private const byte PayloadMaxLengthDefault = 0xff;
+		public const byte PayloadMaxLengthDefault = 0xff;
 
 		// RegHopPeriod
-		private const byte FreqHoppingPeriodDefault = 0x0;
+		public const byte FreqHoppingPeriodDefault = 0x0;
+
+		public const bool LowDataRateOptimizeDefault = false;
+
+		public const bool AgcAutoOnDefault = false;
 
 		// RegModemConfig3
 		private const byte RegModemConfig3LowDataRateOptimizeOn = 0b00001000;
 		private const byte RegModemConfig3LowDataRateOptimizeOff = 0b00000000;
-		private const byte RegModemConfig3LowDataRateOptimizeDefault = RegModemConfig3LowDataRateOptimizeOff;
+		public const byte RegModemConfig3LowDataRateOptimizeDefault = RegModemConfig3LowDataRateOptimizeOff;
 
 		private const byte RegModemConfig3AgcAutoOn = 0b00000100;
 		private const byte RegModemConfig3AgcAutoOff = 0b00000000;
-		private const byte RegModemConfig3AgcAutoDefault = RegModemConfig3AgcAutoOff;
+		public const byte RegModemConfig3AgcAutoDefault = RegModemConfig3AgcAutoOff;
 
 		// RegPpmCorrection
-		private const byte ppmCorrectionDefault = 0x0;
+		public const byte ppmCorrectionDefault = 0x0;
 
 		// RegDetectOptimize
 		public enum RegDetectOptimizeDectionOptimize
@@ -321,12 +327,12 @@ namespace devMobile.IoT.Rfm9x
 			_SF7toSF12 = 0x03,
 			_SF6 = 0x05,
 		};
-		private const RegDetectOptimizeDectionOptimize RegDetectOptimizeDectionOptimizeDefault = RegDetectOptimizeDectionOptimize._SF7toSF12;
+		public const RegDetectOptimizeDectionOptimize RegDetectOptimizeDectionOptimizeDefault = RegDetectOptimizeDectionOptimize._SF7toSF12;
 
 		// RegInvertId
 		private const byte InvertIqOn = 0b01000000;
 		private const byte InvertIqOff = 0b00000000;
-		private const byte InvertIqDefault = InvertIqOn;
+		public const bool InvertIqDefault = false;
 
 		// RegDetectionThreshold
 		public enum RegisterDetectionThreshold
@@ -334,10 +340,10 @@ namespace devMobile.IoT.Rfm9x
 			_SF7toSF12 = 0x0A,
 			_SF6 = 0x0c,
 		}
-		private const RegisterDetectionThreshold RegisterDetectionThresholdDefault = RegisterDetectionThreshold._SF7toSF12;
+		public const RegisterDetectionThreshold RegisterDetectionThresholdDefault = RegisterDetectionThreshold._SF7toSF12;
 
 		// RegSyncWord Syncword default for public networks
-		private const byte RegSyncWordDefault = 0x12;
+		public const byte RegSyncWordDefault = 0x12;
 
 		// RegDioMapping1 
 		[Flags]
@@ -442,9 +448,9 @@ namespace devMobile.IoT.Rfm9x
 		public void Initialise( 
 			double frequency = FrequencyDefault, // RegFrMsb, RegFrMid, RegFrLsb
 			bool rxDoneignoreIfCrcMissing = true, bool rxDoneignoreIfCrcInvalid = true,
-			bool paBoost = false, byte maxPower = RegPAConfigMaxPowerDefault, byte outputPower = RegPAConfigOutputPowerDefault, // RegPaConfig
-			bool ocpOn = true, byte ocpTrim = RegOcpOcpTrimDefault, // RegOcp
-			RegLnaLnaGain lnaGain = LnaGainDefault, bool lnaBoost = false, // RegLna
+			bool paBoost = PABoostDefault, byte maxPower = RegPAConfigMaxPowerDefault, byte outputPower = RegPAConfigOutputPowerDefault, // RegPaConfig
+			bool ocpOn = RegOcpDefault, byte ocpTrim = RegOcpOcpTrimDefault, // RegOcp
+			RegLnaLnaGain lnaGain = LnaGainDefault, bool lnaBoost = LnaBoostDefault, // RegLna
 			RegModemConfigBandwidth bandwidth = RegModemConfigBandwidthDefault, RegModemConfigCodingRate codingRate = RegModemConfigCodingRateDefault, RegModemConfigImplicitHeaderModeOn implicitHeaderModeOn = RegModemConfigImplicitHeaderModeOnDefault, //RegModemConfig1
 			RegModemConfig2SpreadingFactor spreadingFactor = RegModemConfig2SpreadingFactorDefault, bool txContinuousMode = false, bool rxPayloadCrcOn = false,
 			ushort symbolTimeout = SymbolTimeoutDefault,
@@ -452,10 +458,10 @@ namespace devMobile.IoT.Rfm9x
 			byte payloadLength = PayloadLengthDefault,
 			byte payloadMaxLength = PayloadMaxLengthDefault,
 			byte freqHoppingPeriod = FreqHoppingPeriodDefault,
-			bool lowDataRateOptimize = false, bool agcAutoOn = false,
+			bool lowDataRateOptimize = LowDataRateOptimizeDefault, bool agcAutoOn = AgcAutoOnDefault,
 			byte ppmCorrection = ppmCorrectionDefault,
 			RegDetectOptimizeDectionOptimize detectionOptimize = RegDetectOptimizeDectionOptimizeDefault,
-			bool invertIQ = false,
+			bool invertIQ = InvertIqDefault,
 			RegisterDetectionThreshold detectionThreshold = RegisterDetectionThresholdDefault,
 			byte syncWord = RegSyncWordDefault)
 		{
