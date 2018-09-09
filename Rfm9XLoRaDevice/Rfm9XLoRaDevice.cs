@@ -370,6 +370,27 @@ namespace devMobile.IoT.Rfm9x
 		private byte[] DeviceAddress = null;
 #endif
 
+		// Constructor for RPI shields with chip select connected to CS0/CS1 and no reset pin e.g. Uputronics
+		public Rfm9XDevice(ChipSelectPin chipSelectPin, int interruptPinNumber)
+		{
+			RegisterManager = new RegisterManager(chipSelectPin);
+
+			// Check that SX127X chip is present
+			Byte regVersionValue = RegisterManager.ReadByte((byte)Registers.RegVersion);
+			if (regVersionValue != RegVersionValueExpected)
+			{
+				throw new ApplicationException("Semtech SX127X not found");
+			}
+
+			GpioController gpioController = GpioController.GetDefault();
+
+			// Interrupt pin for RX message, TX done etc. notifications
+			InterruptGpioPin = gpioController.OpenPin(interruptPinNumber);
+			InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+
+			InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
+		}
+
 		// Constructor for RPI shields with chip select connected to CS0/CS1 e.g. Elecrow/Electronic tricks
 		public Rfm9XDevice(ChipSelectPin chipSelectPin, int resetPinNumber, int interruptPinNumber)
 		{
@@ -469,11 +490,15 @@ namespace devMobile.IoT.Rfm9x
 			RxDoneIgnoreIfCrcMissing = rxDoneignoreIfCrcMissing;
 			RxDoneIgnoreIfCrcInvalid = rxDoneignoreIfCrcInvalid;
 
-			// Strobe Reset pin briefly to factory reset SX127X chip
-			ResetGpioPin.Write(GpioPinValue.Low);
-			Task.Delay(10);
-			ResetGpioPin.Write(GpioPinValue.High);
-			Task.Delay(10);
+			// If the HopeRF module doesn't have the reset pin connected (e.g. uputroncis) not point in resetting it
+			if (ResetGpioPin != null)
+			{
+				// Strobe Reset pin briefly to factory reset SX127X chip
+				ResetGpioPin.Write(GpioPinValue.Low);
+				Task.Delay(10);
+				ResetGpioPin.Write(GpioPinValue.High);
+				Task.Delay(10);
+			}
 
 			// Put the device into sleep mode so registers can be changed
 			SetMode(RegOpModeMode.Sleep);
