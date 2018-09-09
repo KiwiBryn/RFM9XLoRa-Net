@@ -21,7 +21,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="devMobile.IoT.Rfm9x.UputronicsRPZeroSPI.StartupTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="devMobile.IoT.Rfm9x.UputronicsRPIZeroSPI.StartupTask">
           <BackgroundTasks>
             <iot:Task Type="startup" />
           </BackgroundTasks>

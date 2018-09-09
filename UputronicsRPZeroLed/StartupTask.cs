@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
-namespace devMobile.IoT.Rfm9x.UputronicsRPZeroLed
+namespace devMobile.IoT.Rfm9x.UputronicsRPIZeroLed
 {
 	using System;
 	using System.Threading;

@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
-namespace devMobile.IoT.Rfm9x.UputronicsRPZeroSPI
+namespace devMobile.IoT.Rfm9x.UputronicsRPIZeroSPI
 {
 	using System;
 	using System.Diagnostics;
