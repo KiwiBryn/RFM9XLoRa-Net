@@ -54,10 +54,6 @@ Shield from [@M2M](https://www.tindie.com/products/m2m/1-channel-lorawan-gateway
 
 ![1 Channel LoRaWan Gateway Shield for Raspberry Pi](M2MLoRaShield.jpg)
 
-Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=99)
-
-![Raspberry PiZero LoRa(TM) Expansion Board](UputronicsRPIZeroShield.jpg)
-
 RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
 
 ![Raspberry PiZero LoRa(TM) Expansion Board](UputronicsRPIZeroShield.jpg)
