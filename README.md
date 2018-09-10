@@ -30,6 +30,10 @@ There are also projects for each of the shields
 
 * M2M(https://blog.devmobile.co.nz/2018/08/21/m2m-lorawan-gateway-shield-for-raspberry-pi/)
 
+* Uputronics RPIZero(https://blog.devmobile.co.nz/2018/09/08/uputronics-raspberry-pizero-loratm-expansion-board/)
+
+* Uputroncis RPIPlus(https://blog.devmobile.co.nz/2018/09/10/uputronics-raspberry-pi-loratm-expansion-board/) 
+
 There is also a parallel development project for NetMF which is documented here(https://github.com/KiwiBryn/RFM9XLoRa-NetMF)
 
 My main use case for the Library is a telemetery field gateway uploading data from a number of remote devices.
