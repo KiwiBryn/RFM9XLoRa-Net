@@ -54,9 +54,14 @@ Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/p
 
 ![Raspberry PiZero LoRa(TM) Expansion Board](UputronicsRPIZeroShield.jpg)
 
-Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
+RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
 
 ![Raspberry Pi+ LoRa(TM) Expansion Board](UputronicsRPIPlusShield.jpg)
+
+RPIPlus Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
+
+![Raspberry Pi+ LoRa(TM) Expansion Board](UputronicsRPIPlusShield.jpg)
+
 
 The code has been stress/soak tested with a number of clients
 ![@StressTester](LoRaStress.jpg)
