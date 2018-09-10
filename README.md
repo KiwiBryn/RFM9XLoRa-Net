@@ -62,7 +62,6 @@ RPIPlus Shield from [@Uputronics](https://store.uputronics.com/index.php?route=p
 
 ![Raspberry Pi+ LoRa(TM) Expansion Board](UputronicsRPIPlusShield.jpg)
 
-
 The code has been stress/soak tested with a number of clients
 ![@StressTester](LoRaStress.jpg)
 
