@@ -46,7 +46,7 @@ Shield from [@Elecrow](https://www.elecrow.com/lora-rfm95-iot-board-for-rpi.html
 
 ![Lora RFM95 IOT Board for RPI](LoRaElecrowShield.jpg)
 
-Shield from [@M2M](https://www.tindie.com/products/m2m/1-channel-lorawan-gateway-shield-for-raspberry-pi/)
+Shield from [@M2M](https://www.tindie.com/products/m2m/1-channel-lorawan-gateway-shield-for-raspberry-pi)
 
 ![1 Channel LoRaWan Gateway Shield for Raspberry Pi](M2MLoRaShield.jpg)
 
@@ -56,7 +56,7 @@ Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/p
 
 RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
 
-![Raspberry Pi+ LoRa(TM) Expansion Board](UputronicsRPIPlusShield.jpg)
+![Raspberry PiZero LoRa(TM) Expansion Board](UputronicsRPIZeroShield.jpg)
 
 RPIPlus Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
 
