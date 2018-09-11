@@ -25,8 +25,9 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 	using Windows.ApplicationModel.Background;
 
 	public sealed class StartupTask : IBackgroundTask
-    {
-		private byte NessageCount = Byte.MaxValue;
+	{
+		private byte MessageCount = Byte.MaxValue;
+
 #if DRAGINO
 		private const byte ChipSelectLine = 25;
 		private const byte ResetLine = 17;
@@ -58,15 +59,75 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
 #endif
 
+#if UPUTRONICS_RPIPLUS_CS0 && !UPUTRONICS_RPIPLUS_CS1
+		private const byte InterruptLine = 25;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS0, InterruptLine);
+#endif
+#if !UPUTRONICS_RPIPLUS_CS0 && UPUTRONICS_RPIPLUS_CS1
+		private const byte InterruptLine = 16;
+		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLine);
+#endif
+
+#if UPUTRONICS_RPIPLUS_CS0 && UPUTRONICS_RPIPLUS_CS1 // 433MHz and 915MHz in my setup
+		private const byte InterruptLineCS0 = 25;
+		private Rfm9XDevice rfm9XDeviceCS0 = new Rfm9XDevice(ChipSelectPin.CS0, InterruptLineCS0);
+		private const byte InterruptLineCS1 = 16;
+		private Rfm9XDevice rfm9XDeviceCS1 = new Rfm9XDevice(ChipSelectPin.CS1, InterruptLineCS1);
+#endif
+
+#if UPUTRONICS_RPIPLUS_CS0 && UPUTRONICS_RPIPLUS_CS1
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
-			rfm9XDevice.Initialise(915000000.0, paBoost: true, rxPayloadCrcOn : true);
+			rfm9XDeviceCS0.Initialise(915000000.0, paBoost: true, rxPayloadCrcOn: true);
+			rfm9XDeviceCS1.Initialise(433000000.0, paBoost: true, rxPayloadCrcOn: true);
+#if DEBUG
+			rfm9XDeviceCS0.RegisterDump();
+			rfm9XDeviceCS1.RegisterDump();
+#endif
 
+			rfm9XDeviceCS0.OnReceive += Rfm9XDevice_OnReceive;
+			rfm9XDeviceCS1.OnReceive += Rfm9XDevice_OnReceive;
+#if ADDRESSED_MESSAGES_PAYLOAD
+			rfm9XDeviceCS0.Receive(UTF8Encoding.UTF8.GetBytes(Environment.MachineName));
+			rfm9XDeviceCS1.Receive(UTF8Encoding.UTF8.GetBytes(Environment.MachineName));
+#else
+			rfm9XDeviceCS0.Receive();
+			rfm9XDeviceCS1.Receive();
+#endif
+			rfm9XDeviceCS0.OnTransmit += Rfm9XDevice_OnTransmit;
+			rfm9XDeviceCS1.OnTransmit += Rfm9XDevice_OnTransmit;
+
+			Task.Delay(10000).Wait();
+
+			while (true)
+			{
+				string messageText = string.Format("Hello from {0} ! {1}", Environment.MachineName, MessageCount);
+				MessageCount -= 1;
+
+				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
+				Debug.WriteLine("{0:HH:mm:ss}-TX {1} byte message {2}", DateTime.Now, messageBytes.Length, messageText);
+#if ADDRESSED_MESSAGES_PAYLOAD
+				this.rfm9XDeviceCS0.Send(UTF8Encoding.UTF8.GetBytes("Netduino"), messageBytes);
+				this.rfm9XDeviceCS1.Send(UTF8Encoding.UTF8.GetBytes("Arduino1"), messageBytes);
+#else
+				this.rfm9XDeviceCS0.Send(messageBytes);
+				this.rfm9XDeviceCS1.Send(messageBytes);
+#endif
+				Task.Delay(10000).Wait();
+			}
+		}
+
+#else
+
+		public void Run(IBackgroundTaskInstance taskInstance)
+		{
+			rfm9XDevice.Initialise(433000000, paBoost: true, rxPayloadCrcOn : true);
+			rfm9XDevice.Initialise(915000000, paBoost: true, rxPayloadCrcOn : true);
 #if DEBUG
 			rfm9XDevice.RegisterDump();
 #endif
 
-			rfm9XDevice.OnReceive += Rfm9XDevice_OnReceive;
+		rfm9XDevice.OnReceive += Rfm9XDevice_OnReceive;
 #if ADDRESSED_MESSAGES_PAYLOAD
 			rfm9XDevice.Receive(UTF8Encoding.UTF8.GetBytes(Environment.MachineName));
 #else
@@ -78,8 +139,8 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 			while (true)
 			{
-				string messageText = string.Format("Hello from {0} ! {1}", Environment.MachineName, NessageCount);
-				NessageCount -= 1;
+				string messageText = string.Format("Hello from {0} ! {1}", Environment.MachineName, MessageCount);
+				MessageCount -= 1;
 
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
 				Debug.WriteLine("{0:HH:mm:ss}-TX {1} byte message {2}", DateTime.Now, messageBytes.Length, messageText);
@@ -91,6 +152,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 				Task.Delay(10000).Wait();
 			}
 		}
+#endif
 
 		private void Rfm9XDevice_OnReceive(object sender, Rfm9XDevice.OnDataReceivedEventArgs e)
 		{
@@ -118,4 +180,3 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 		}
 	}
 }
-
