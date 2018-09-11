@@ -30,6 +30,10 @@ There are also projects for each of the shields
 
 * M2M(https://blog.devmobile.co.nz/2018/08/21/m2m-lorawan-gateway-shield-for-raspberry-pi/)
 
+* Uputronics RPIZero(https://blog.devmobile.co.nz/2018/09/08/uputronics-raspberry-pizero-loratm-expansion-board/)
+
+* Uputroncis RPIPlus(https://blog.devmobile.co.nz/2018/09/10/uputronics-raspberry-pi-loratm-expansion-board/) 
+
 There is also a parallel development project for NetMF which is documented here(https://github.com/KiwiBryn/RFM9XLoRa-NetMF)
 
 My main use case for the Library is a telemetery field gateway uploading data from a number of remote devices.
@@ -46,13 +50,17 @@ Shield from [@Elecrow](https://www.elecrow.com/lora-rfm95-iot-board-for-rpi.html
 
 ![Lora RFM95 IOT Board for RPI](LoRaElecrowShield.jpg)
 
-Shield from [@M2M](https://www.tindie.com/products/m2m/1-channel-lorawan-gateway-shield-for-raspberry-pi/)
+Shield from [@M2M](https://www.tindie.com/products/m2m/1-channel-lorawan-gateway-shield-for-raspberry-pi)
 
 ![1 Channel LoRaWan Gateway Shield for Raspberry Pi](M2MLoRaShield.jpg)
 
-Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=99)
+RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
 
 ![Raspberry PiZero LoRa(TM) Expansion Board](UputronicsRPIZeroShield.jpg)
+
+RPIPlus Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
+
+![Raspberry Pi+ LoRa(TM) Expansion Board](UputronicsRPIPlusShield.jpg)
 
 The code has been stress/soak tested with a number of clients
 ![@StressTester](LoRaStress.jpg)
