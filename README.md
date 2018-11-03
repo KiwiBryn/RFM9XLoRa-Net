@@ -38,11 +38,11 @@ There is also a parallel development project for NetMF which is documented here(
 
 My main use case for the Library is a telemetery field gateway uploading data from a number of remote devices.
 
-Shield from [@Dragino ](http://www.dragino.com/products/lora/item/106-lora-gps-hat.html)
+Shield from [@Dragino](http://www.dragino.com/products/lora/item/106-lora-gps-hat.html)
 
 ![LoRa GPS HAT for Raspberry Pi](DraginoRPILoRaGPSShield.jpg)
 
-Shield from [@ElectronicTracks](https://www.tindie.com/products/electronictrik/loralorawan-shield-for-raspberry-pi-zero-and-pi3)
+Shield from [@ElectronicTricks](https://www.tindie.com/products/electronictrik/loralorawan-shield-for-raspberry-pi-zero-and-pi3)
 
 ![Lora/LoraWan shield for Raspberry Pi Zero and PI3](LoRaElectronicsTricksShield.jpg)
 
@@ -54,7 +54,7 @@ Shield from [@M2M](https://www.tindie.com/products/m2m/1-channel-lorawan-gateway
 
 ![1 Channel LoRaWan Gateway Shield for Raspberry Pi](M2MLoRaShield.jpg)
 
-RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
+RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=91)
 
 ![Raspberry PiZero LoRa(TM) Expansion Board](UputronicsRPIZeroShield.jpg)
 
