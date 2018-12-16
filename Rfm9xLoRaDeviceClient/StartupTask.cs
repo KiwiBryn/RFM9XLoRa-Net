@@ -26,6 +26,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 	public sealed class StartupTask : IBackgroundTask
 	{
+		const double Frequency = 915000000.0;
 		private byte MessageCount = Byte.MaxValue;
 
 #if DRAGINO
@@ -121,8 +122,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
-			rfm9XDevice.Initialise(433000000, paBoost: true, rxPayloadCrcOn : true);
-			rfm9XDevice.Initialise(915000000, paBoost: true, rxPayloadCrcOn : true);
+			rfm9XDevice.Initialise(Frequency, paBoost: true, rxPayloadCrcOn : true);
 #if DEBUG
 			rfm9XDevice.RegisterDump();
 #endif
