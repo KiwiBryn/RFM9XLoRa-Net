@@ -34,6 +34,10 @@ There are also projects for each of the shields
 
 * Uputroncis RPIPlus(https://blog.devmobile.co.nz/2018/09/10/uputronics-raspberry-pi-loratm-expansion-board/) 
 
+* Adafruit LoRa Radio Bonnet with OLED RFM95 433MHz (https://www.adafruit.com/product/4073) 
+
+* Adafruit LoRa Radio Bonnet with OLED RFM95 915MHz (https://www.adafruit.com/product/4074) 
+
 There is also a parallel development project for NetMF which is documented here(https://github.com/KiwiBryn/RFM9XLoRa-NetMF)
 
 My main use case for the Library is a telemetery field gateway uploading data from a number of remote devices.
@@ -61,6 +65,10 @@ RPIZero Shield from [@Uputronics](https://store.uputronics.com/index.php?route=p
 RPIPlus Shield from [@Uputronics](https://store.uputronics.com/index.php?route=product/product&path=61&product_id=68)
 
 ![Raspberry Pi+ LoRa(TM) Expansion Board](UputronicsRPIPlusShield.jpg)
+
+LoRa Radio Bonnet from [@Adafruit](https://www.adafruit.com/product/4074) 
+
+![Adafruit LoRa(TM)Radio Bonnet with OLED](AdaFruitLoRaBonnet.jpg)
 
 The code has been stress/soak tested with a number of clients
 ![@StressTester](LoRaStress.jpg)
