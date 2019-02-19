@@ -31,19 +31,58 @@
  */
 namespace devMobile.IoT.Rfm9x.AdafruitButtons
 {
+	using System;
+	using System.Diagnostics;
 	using Windows.ApplicationModel.Background;
+	using Windows.Devices.Gpio;
 
 	public sealed class StartupTask : IBackgroundTask
     {
-        public void Run(IBackgroundTaskInstance taskInstance)
+		private BackgroundTaskDeferral backgroundTaskDeferral = null;
+		private GpioPin InterruptGpioPin1 = null;
+		private GpioPin InterruptGpioPin2 = null;
+		private GpioPin InterruptGpioPin3 = null;
+		private const int InterruptPinNumber1 = 5;
+		private const int InterruptPinNumber2 = 6;
+		private const int InterruptPinNumber3 = 12;
+		private readonly TimeSpan debounceTimeout = new TimeSpan(0, 0, 15);
+
+
+		public void Run(IBackgroundTaskInstance taskInstance)
         {
-            // 
-            // TODO: Insert code to perform background work
-            //
-            // If you start any asynchronous methods here, prevent the task
-            // from closing prematurely by using BackgroundTaskDeferral as
-            // described in http://aka.ms/backgroundtaskdeferral
-            //
-        }
-    }
+			Debug.WriteLine("Application startup");
+
+			try
+			{
+				GpioController gpioController = GpioController.GetDefault();
+
+				InterruptGpioPin1 = gpioController.OpenPin(InterruptPinNumber1);
+				InterruptGpioPin1.SetDriveMode(GpioPinDriveMode.InputPullUp);
+				InterruptGpioPin1.ValueChanged += InterruptGpioPin_ValueChanged; ;
+
+				InterruptGpioPin2 = gpioController.OpenPin(InterruptPinNumber2);
+				InterruptGpioPin2.SetDriveMode(GpioPinDriveMode.InputPullUp);
+				InterruptGpioPin2.ValueChanged += InterruptGpioPin_ValueChanged; ;
+
+				InterruptGpioPin3 = gpioController.OpenPin(InterruptPinNumber3);
+				InterruptGpioPin3.SetDriveMode(GpioPinDriveMode.InputPullUp);
+				InterruptGpioPin3.ValueChanged += InterruptGpioPin_ValueChanged; ;
+
+				Debug.WriteLine("Digital Input Interrupt configuration success");
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Digital Input Interrupt configuration failed " + ex.Message);
+				return;
+			}
+
+			//enable task to continue running in background
+			backgroundTaskDeferral = taskInstance.GetDeferral();
+		}
+
+		private void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
+		{
+			Debug.WriteLine($"Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
+		}
+	}
 }
