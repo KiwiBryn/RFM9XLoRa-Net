@@ -45,8 +45,6 @@ namespace devMobile.IoT.Rfm9x.AdafruitButtons
 		private const int InterruptPinNumber1 = 5;
 		private const int InterruptPinNumber2 = 6;
 		private const int InterruptPinNumber3 = 12;
-		private readonly TimeSpan debounceTimeout = new TimeSpan(0, 0, 15);
-
 
 		public void Run(IBackgroundTaskInstance taskInstance)
         {
