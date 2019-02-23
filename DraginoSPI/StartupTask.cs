@@ -20,14 +20,25 @@ namespace devMobile.IoT.Rfm9x.DraginoSPI
 	using System.Diagnostics;
 	using System.Threading;
 	using Windows.ApplicationModel.Background;
+	using Windows.Devices.Gpio;
 	using Windows.Devices.Spi;
 
 	public sealed class StartupTask : IBackgroundTask
 	{
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
+			GpioController gpioController = GpioController.GetDefault();
+			GpioPin chipSelectGpioPin = null;
+
+			chipSelectGpioPin = gpioController.OpenPin(25); // DIY CS for Dragino
+			if (chipSelectGpioPin != null)
+			{
+				chipSelectGpioPin.SetDriveMode(GpioPinDriveMode.Output);
+				chipSelectGpioPin.Write(GpioPinValue.High);
+			}
+
 			SpiController spiController = SpiController.GetDefaultAsync().AsTask().GetAwaiter().GetResult();
-			var settings = new SpiConnectionSettings(0) 
+			var settings = new SpiConnectionSettings(0) // Unused pin which shouldn't intefer 
 			{
 				ClockFrequency = 500000,
 				Mode = SpiMode.Mode0,   // From SemTech docs pg 80 CPOL=0, CPHA=0
@@ -40,7 +51,9 @@ namespace devMobile.IoT.Rfm9x.DraginoSPI
 				byte[] writeBuffer = new byte[] { 0x42 }; // RegVersion
 				byte[] readBuffer = new byte[1];
 
+				chipSelectGpioPin.Write(GpioPinValue.Low);
 				Device.TransferSequential(writeBuffer, readBuffer);
+				chipSelectGpioPin.Write(GpioPinValue.High);
 
 				byte registerValue = readBuffer[0];
 				Debug.WriteLine("Register 0x{0:x2} - Value 0X{1:x2} - Bits {2}", 0x42, registerValue, Convert.ToString(registerValue, 2).PadLeft(8, '0'));
