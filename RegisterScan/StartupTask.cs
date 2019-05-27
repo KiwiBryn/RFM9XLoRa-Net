@@ -72,7 +72,7 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
 			{
 				for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
 				{
-					byte registerValue = rfm9XDevice.RegisterReadByte(0x42);
+					byte registerValue = rfm9XDevice.RegisterReadByte(registerIndex);
 
 					Debug.WriteLine("Register 0x{0:x2} - Value 0X{1:x2} - Bits {2}", registerIndex, registerValue, Convert.ToString(registerValue, 2).PadLeft(8, '0'));
 				}
