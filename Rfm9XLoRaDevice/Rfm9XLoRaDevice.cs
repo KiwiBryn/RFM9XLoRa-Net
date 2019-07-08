@@ -490,7 +490,7 @@ namespace devMobile.IoT.Rfm9x
 			RxDoneIgnoreIfCrcMissing = rxDoneignoreIfCrcMissing;
 			RxDoneIgnoreIfCrcInvalid = rxDoneignoreIfCrcInvalid;
 
-			// If the HopeRF module doesn't have the reset pin connected (e.g. uputroncis) not point in resetting it
+			// If the HopeRF module doesn't have the reset pin connected (e.g. uputronics) not point in resetting it
 			if (ResetGpioPin != null)
 			{
 				// Strobe Reset pin briefly to factory reset SX127X chip
