@@ -38,7 +38,7 @@ There are also projects for each of the shields
 
 * Adafruit LoRa Radio Bonnet with OLED RFM95 915MHz (https://www.adafruit.com/product/4074) 
 
-There is also a parallel development project for NetMF which is documented here(https://github.com/KiwiBryn/RFM9XLoRa-NetMF)
+There are also a parallel development projects for NetMF which is documented here(https://github.com/KiwiBryn/RFM9XLoRa-NetMF) and Wilderness Labs Meadow devices which is documented here (https://github.com/KiwiBryn/FieldGateway.LoRa.MeadowClient).
 
 My main use case for the Library is a telemetery field gateway uploading data from a number of remote devices.
 
