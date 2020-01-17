@@ -21,6 +21,7 @@
     <PackageCertificateKeyFile>ReceiveTransmitInterrupt_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxPackage>true</AppxPackage>
     <ContainsStartupTask>true</ContainsStartupTask>
+    <PackageCertificateThumbprint>1FA26EDA0A560DA46B05F1FEE373D38F9EBB2418</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
