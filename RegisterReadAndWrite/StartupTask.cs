@@ -172,11 +172,11 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 				Debug.WriteLine("Set the preamble to 0x80 (write word)");
 				rfm9XDevice.RegisterWriteWord(0x20, 0x80);
 
-				Debug.WriteLine("Read the centre frequency (read byte array)");
+				Debug.WriteLine("Read the center frequency (read byte array)");
 				byte[] frequencyReadBytes = rfm9XDevice.RegisterRead(0x06, 3);
 				Debug.WriteLine("Frequency Msb 0x{0:x2} Mid 0x{1:x2} Lsb 0x{2:x2}", frequencyReadBytes[0], frequencyReadBytes[1], frequencyReadBytes[2]);
 
-				Debug.WriteLine("Set the centre frequency to 916MHz ( write byte array)");
+				Debug.WriteLine("Set the center frequency to 916MHz ( write byte array)");
 				byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 };
 				rfm9XDevice.RegisterWrite(0x06, frequencyWriteBytes);
 
