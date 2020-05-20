@@ -45,7 +45,7 @@ namespace devMobile.IoT.Rfm9x.RefactorRegisterManager
 
 			// Interrupt pin for RX message, TX done etc. notifications
 			InterruptGpioPin = gpioController.OpenPin(interruptPin);
-			resetGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+			InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
 
 			InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
 		}

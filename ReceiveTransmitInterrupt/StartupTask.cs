@@ -58,7 +58,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
 
 			// Interrupt pin for RX message & TX done notification 
 			InterruptGpioPin = gpioController.OpenPin(interruptPin);
-			resetGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+			InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
 
 			InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
 
