@@ -29,4 +29,7 @@
       </Extensions>
     </Application>
   </Applications>
+  <Capabilities>
+    <DeviceCapability Name="lowLevel" />
+  </Capabilities>
 </Package>
