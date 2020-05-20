@@ -21,7 +21,7 @@
     <PackageCertificateKeyFile>UputronicsRPIZeroLed_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxPackage>true</AppxPackage>
     <ContainsStartupTask>true</ContainsStartupTask>
-    <PackageCertificateThumbprint>0FB614C2AA800F0FD26E2D0931C5A49B2352D3DF</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>B66F455E888BFD5F02C4741F654E5C8984584EFA</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>

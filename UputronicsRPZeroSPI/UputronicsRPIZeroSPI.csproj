@@ -21,7 +21,7 @@
     <PackageCertificateKeyFile>UputronicsRPIZeroSPI_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxPackage>true</AppxPackage>
     <ContainsStartupTask>true</ContainsStartupTask>
-    <PackageCertificateThumbprint>A321E50D56CF17E5A77F8D4961FD7893BA278DE7</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>99C43A15C487503AB74683F32D5BC2D4E73BA8E2</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
