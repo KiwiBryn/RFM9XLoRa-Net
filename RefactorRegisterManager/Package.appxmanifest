@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
-  <Identity Name="RefactorRegisterManager-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
+  <Identity Name="RefactorRegisterManager-uwp" Publisher="CN=BrynLewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="498b1d7c-374f-460b-ae00-aa6821c3987c" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>RefactorRegisterManager</DisplayName>

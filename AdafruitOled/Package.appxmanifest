@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
-  <Identity Name="AdafruitOled-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
+  <Identity Name="AdafruitOled-uwp" Publisher="CN=BrynLewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="82d4ba66-4078-490a-b4f9-f73d505d45c4" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>AdafruitOled</DisplayName>

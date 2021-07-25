@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
-  <Identity Name="RegisterReadAndWrite-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
+  <Identity Name="RegisterReadAndWrite-uwp" Publisher="CN=BrynLewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="85515636-1127-4359-91b0-2c38e064ddda" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>RegisterReadAndWrite</DisplayName>
