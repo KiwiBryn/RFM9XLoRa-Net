@@ -636,7 +636,7 @@ namespace devMobile.IoT.Rfm9x.EnumsAndMasks
 		private const byte InterruptLine = 4;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice( ChipSelectPin.CS0, ChipSelectLine, ResetLine, InterruptLine); // Dragino/M2m shields
 		//private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectPin.CS1, ResetLine, InterruptLine); // Elecrow/Electronic tricks shields
-		private byte NessageCount = Byte.MaxValue;
+		private byte messageCount = Byte.MaxValue;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
@@ -646,8 +646,8 @@ namespace devMobile.IoT.Rfm9x.EnumsAndMasks
 
 			while (true)
 			{
-				string messageText = "Hello W10 IoT Core LoRa! " + NessageCount.ToString();
-				NessageCount -= 1;
+				string messageText = "Hello W10 IoT Core LoRa! " + messageCount.ToString();
+				messageCount -= 1;
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
 				Debug.WriteLine("Sending {0} bytes message {1}", messageBytes.Length, messageText);
 				this.rfm9XDevice.SendMessage(messageBytes);
