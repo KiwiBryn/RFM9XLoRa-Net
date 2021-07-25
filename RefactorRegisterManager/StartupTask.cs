@@ -102,7 +102,7 @@ namespace devMobile.IoT.Rfm9x.RefactorRegisterManager
 		private const byte ResetLine = 17;
 		private const byte InterruptLine = 4;
 		private Rfm9XDevice rfm9XDevice = new Rfm9XDevice(ChipSelectLine, ResetLine, InterruptLine);
-		private byte NessageCount = Byte.MaxValue;
+		private byte MessageCount = Byte.MaxValue;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
@@ -131,8 +131,8 @@ namespace devMobile.IoT.Rfm9x.RefactorRegisterManager
 				// Set the Register Fifo address pointer
 				rfm9XDevice.RegisterManager.WriteByte(0x0D, 0x0); // RegFifoAddrPtr 
 
-				string messageText = "W10 IoT Core LoRa! " + NessageCount.ToString();
-				NessageCount -= 1;
+				string messageText = "W10 IoT Core LoRa! " + MessageCount.ToString();
+				MessageCount -= 1;
 
 				// load the message into the fifo
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
